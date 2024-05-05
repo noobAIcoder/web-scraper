@@ -1,0 +1,156 @@
+#pseudocode
+# main.py
+- Import necessary libraries
+- Create an instance of MainWindow
+- Show the main window
+- Execute the application
+
+# main_window.py
+- Import necessary libraries
+
+- Define MainWindow class
+    - Initialize the main window
+        - Set up the GUI elements
+            - Login settings: url_input, login_field1_input, login_field1_value_input, login_field2_input, login_field2_value_input,
+                              login_field3_input, login_field3_value_input, login_button_selector_input, mode_button_selector_input
+            - Scraping settings: search_query_input, search_input_input, search_button_input,
+                                wait_login_input, wait_mode_input, wait_search_input,
+                                data_div_input, next_button_input
+            - Browser settings: user_agent_input
+            - Status widgets: status_label, progress_bar, log_text_edit
+        - Load settings from config.ini
+        - Connect button signals to corresponding slots
+    
+    - Define login_clicked slot
+        - Get website URL and login credentials from input fields
+        - Validate input fields
+        - Create an instance of Scraper and pass the URL and credentials
+        - Connect scraper signals to corresponding slots
+        - Start the login process in a separate thread
+    
+    - Define search_clicked slot
+        - Get search query from search_query_input field
+        - Validate search query
+        - Pass the search query to the scraper instance
+        - Start the search process in a separate thread
+    
+    - Define start_scraping_clicked slot
+        - Get data div selector and next button selector from input fields
+        - Validate selectors
+        - Pass the selectors to the scraper instance
+        - Start the scraping process in a separate thread
+    
+    - Define stop_scraping_clicked slot
+        - Stop the scraping process
+    
+    - Define cancel_scraping_clicked slot
+        - Cancel the scraping process and close the browser
+    
+    - Define update_status slot
+        - Update the status_label with the received status message
+    
+    - Define update_progress slot
+        - Update the progress_bar with the received progress value
+        - Display additional progress information in the log_text_edit
+    
+    - Define log_message slot
+        - Append the received log message to the log_text_edit
+    
+    - Define handle_error slot
+        - Display the received error message in a dialog box
+        - Provide options for retry or cancellation
+    
+    - Define save_settings method
+        - Get settings from input fields
+        - Write settings to config.ini using Config class
+    
+    - Define load_settings method
+        - Read settings from config.ini using Config class
+        - Update input fields with loaded settings
+
+# scraper.py
+- Import necessary libraries
+
+- Define BaseScraper class
+    - Initialize the base scraper
+        - Set up Selenium WebDriver with ChromeDriver using WebDriverManager
+        - Set up Chrome options (user agent, window size)
+        - Configure timeouts and implicit waits
+    
+    - Define common scraping methods and error handling
+
+- Define Scraper class (derived from BaseScraper)
+    - Initialize the scraper
+        - Call the base scraper initialization
+        - Initialize SQLite database connection
+        - Initialize progress tracking variables
+    
+    - Define login method
+        - Navigate to the website URL
+        - Find login form elements and input credentials
+        - Submit the login form
+        - Check for login success by verifying the presence of the mode selection button
+        - Handle authentication errors and emit appropriate error signals
+        - Emit login status signal
+    
+    - Define search method
+        - Find search form element and input search query
+        - Submit the search form
+        - Handle search errors and emit appropriate error signals
+        - Emit search status signal
+    
+    - Define scrape_data method
+        - Find data div elements and extract desired data
+        - Handle parsing errors and emit appropriate error signals
+        - Store scraped data in SQLite database
+        - Check for the presence of the next button
+        - If the next button is found, click it and repeat the scraping process
+        - Emit progress signal with current page, total items scraped, and estimated time remaining
+        - If an error occurs during scraping, emit error signal with error message and retry options
+        - Log important events and debug information
+    
+    - Define stop_scraping method
+        - Set the stop flag to True
+    
+    - Define cancel_scraping method
+        - Set the cancel flag to True
+        - Close the browser and release resources
+
+# database.py
+- Import necessary libraries
+
+- Define Database class
+    - Initialize the database connection
+    - Create tables if they don't exist
+    
+    - Define insert_data method
+        - Insert scraped data into the corresponding table
+        - Handle database errors and emit appropriate error signals
+    
+    - Define close_connection method
+        - Close the database connection
+
+# config.py
+- Import necessary libraries
+
+- Define Config class
+    - Initialize the config parser
+    
+    - Define read_config method
+        - Read the config file and return the parsed settings
+        - Handle missing or invalid settings
+    
+    - Define write_config method
+        - Write the settings to the config file
+        - Handle writing errors and emit appropriate error signals
+
+# logger.py
+- Import necessary libraries
+
+- Define Logger class
+    - Initialize the logger with the desired log file path and log level
+    
+    - Define log method
+        - Log the message with the specified log level
+        - Format the log message with timestamp and log level
+        - Write the log message to the log file
