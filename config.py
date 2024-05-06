@@ -21,7 +21,7 @@ class Config(QObject):
             for section, options in settings.items():
                 self.config[section] = options
 
-            with open("config.ini", "w") as config_file:
+            with open("config.ini", "w", encoding="utf-8") as config_file:
                 self.config.write(config_file)
         except configparser.Error as e:
             self.error_occurred.emit("Error writing config: {}".format(str(e)))

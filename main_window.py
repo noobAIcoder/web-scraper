@@ -244,6 +244,9 @@ class MainWindow(QMainWindow):
             }
         }
 
+        print("Settings to be saved:")
+        print(settings)
+
         config.write_config(settings)
 
     def login_clicked(self):

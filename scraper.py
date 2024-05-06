@@ -12,6 +12,7 @@ from config import Config
 from database import Database
 from logger import Logger
 import time
+import random
 
 
 class BaseScraper(QObject):
@@ -74,14 +75,17 @@ class Scraper(BaseScraper):
             mode_button_selector = self.login_credentials["mode_button_selector"]
 
             field1_element = self.driver.find_element(By.CSS_SELECTOR, field1_identifier)
+            field1_element.clear()  # Clear the field before sending keys
             field1_element.send_keys(field1_value)
 
             if field2_identifier and field2_value:
                 field2_element = self.driver.find_element(By.CSS_SELECTOR, field2_identifier)
+                field2_element.clear()  # Clear the field before sending keys
                 field2_element.send_keys(field2_value)
 
             if field3_identifier and field3_value:
                 field3_element = self.driver.find_element(By.CSS_SELECTOR, field3_identifier)
+                field3_element.clear()  # Clear the field before sending keys
                 field3_element.send_keys(field3_value)
 
             login_button = self.driver.find_element(By.CSS_SELECTOR, button_selector)
@@ -108,6 +112,18 @@ class Scraper(BaseScraper):
             search_button_identifier = self.login_credentials["search_button_identifier"]
 
             search_input = self.driver.find_element(By.CSS_SELECTOR, search_input_identifier)
+            search_input.clear()
+            time.sleep(1)  # Wait for 1 second
+            search_input.click()  # Click on the city selection input box
+            search_input.click()  # Click on the city selection input box            
+            time.sleep(1)  # Wait for 1 second
+            #search_input.click()  # Click on the city selection input box again            
+            search_input.clear()
+            time.sleep(1)  # Wait for 1 second
+            search_input.click()  # Click on the city selection input box
+            search_input.click()  # Click on the city selection input box            
+            time.sleep(1)  # Wait for 1 second
+            #search_input.click()  # Click on the city selection input box again
             search_input.clear()
             search_input.send_keys(search_query)
             self.logger.log("Entered search query: {}".format(search_query))
@@ -138,6 +154,7 @@ class Scraper(BaseScraper):
                 self.logger.log("Scraping page {}".format(page))
 
                 try:
+                    time.sleep(random.uniform(7, 11))
                     data_divs = self.driver.find_elements(By.CSS_SELECTOR, data_div_selector)
                     self.logger.log("Found {} data divs on page {}".format(len(data_divs), page))
 
