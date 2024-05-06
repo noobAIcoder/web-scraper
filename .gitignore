@@ -1,3 +1,7 @@
+#source files
+*pseudocode*.*
+*.pseudocode
+
 #databases
 *.db
 
