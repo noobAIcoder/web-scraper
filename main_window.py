@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         self.setup_login_settings()
         self.setup_scraping_settings()
         self.setup_status_widgets()
-        self.setup_browser_settings()  # Add this line
+        self.setup_browser_settings()
 
         self.load_settings()
 
@@ -148,6 +148,11 @@ class MainWindow(QMainWindow):
         scraping_layout.addWidget(self.next_button_label)
         scraping_layout.addWidget(self.next_button_input)
 
+        self.prev_button_label = QLabel("Previous Button Selector:")
+        self.prev_button_input = QLineEdit()
+        scraping_layout.addWidget(self.prev_button_label)
+        scraping_layout.addWidget(self.prev_button_input)
+
         self.search_button = QPushButton("Search")
         self.search_button.clicked.connect(self.search_clicked)
         scraping_layout.addWidget(self.search_button)
@@ -209,6 +214,8 @@ class MainWindow(QMainWindow):
             self.wait_search_input.setText(settings.get("scraping", "wait_search", fallback="2"))
             self.data_div_input.setText(settings.get("scraping", "data_div_selector", fallback=""))
             self.next_button_input.setText(settings.get("scraping", "next_button_selector", fallback=""))
+            self.prev_button_input.setText(settings.get("scraping", "prev_button_selector", fallback=""))
+            self.max_iterations = int(settings.get("scraping", "max_iterations", fallback="40"))
             user_agent = settings.get("browser", "user_agent", fallback="")
             if user_agent:
                 self.user_agent_input.setText(user_agent)
@@ -237,15 +244,13 @@ class MainWindow(QMainWindow):
                 "wait_mode": self.wait_mode_input.text(),
                 "wait_search": self.wait_search_input.text(),
                 "data_div_selector": self.data_div_input.text(),
-                "next_button_selector": self.next_button_input.text()
+                "next_button_selector": self.next_button_input.text(),
+                "prev_button_selector": self.prev_button_input.text()
             },
             "browser": {
                 "user_agent": self.user_agent_input.text()
             }
         }
-
-        print("Settings to be saved:")
-        print(settings)
 
         config.write_config(settings)
 
@@ -285,7 +290,6 @@ class MainWindow(QMainWindow):
         self.scraper.scraping_finished.connect(self.update_status)
         self.scraper.error_occurred.connect(self.handle_error)
         self.scraper.message_logged.connect(self.log_message)
-
         self.scraper.login()
 
     def search_clicked(self):
@@ -302,7 +306,10 @@ class MainWindow(QMainWindow):
 
     def start_scraping_clicked(self):
         data_div_selector = self.data_div_input.text()
+        table_selector = "div.k-grid-content"  # Update with the actual selector for the table container
+        tbody_selector = "tbody"  # Update with the actual selector for tbody
         next_button_selector = self.next_button_input.text()
+        timeout = 40  # Set the desired timeout value
 
         if not data_div_selector:
             QMessageBox.critical(self, "Error", "Please enter a data div selector.")
@@ -316,7 +323,7 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "Error", "Please log in and perform a search before starting scraping.")
             return
 
-        self.scraper.scrape_data(data_div_selector, next_button_selector)
+        self.scraper.start_scraping(data_div_selector, table_selector, tbody_selector, next_button_selector, timeout)
 
     def stop_scraping_clicked(self):
         if self.scraper:
@@ -328,7 +335,7 @@ class MainWindow(QMainWindow):
 
     def update_status(self, status):
         self.status_label.setText(f"Status: {status}")
-    
+
     def update_progress(self, progress):
         self.progress_bar.setValue(progress)
 

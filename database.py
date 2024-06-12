@@ -1,11 +1,7 @@
 import sqlite3
-from PyQt5.QtCore import QObject, pyqtSignal
 
-class Database(QObject):
-    error_occurred = pyqtSignal(str)
-
+class Database:
     def __init__(self):
-        super().__init__()
         self.conn = sqlite3.connect("scraped_data.db")
         self.create_table()
 
@@ -22,7 +18,7 @@ class Database(QObject):
             """)
             self.conn.commit()
         except sqlite3.Error as e:
-            self.error_occurred.emit("Error creating table: {}".format(str(e)))
+            print("Error creating table:", str(e))
 
     def insert_data(self, url, data):
         try:
@@ -33,7 +29,7 @@ class Database(QObject):
             """, (url, data))
             self.conn.commit()
         except sqlite3.Error as e:
-            self.error_occurred.emit("Error inserting data: {}".format(str(e)))
+            print("Error inserting data:", str(e))
 
     def close_connection(self):
         self.conn.close()
